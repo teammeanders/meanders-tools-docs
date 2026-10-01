@@ -1,4 +1,7 @@
+"use client";
+import { useRef } from "react";
 import type { MeandersComponent } from "@/types/meanders";
+import { WireLayer } from "@/components/WireLayer";
 
 type Props = {
   component: MeandersComponent;
@@ -7,217 +10,209 @@ type Props = {
 const ICON_BASE =
   "https://raw.githubusercontent.com/teammeanders/Meanders.Tools/master/assets/icons/";
 
-function Wire({ path }: { path: string }) {
+const HEADER_HEIGHT = 44;
+const FOOTER_HEIGHT = 40;
+const PORT_ROW_HEIGHT = 40;
+const BODY_PADDING = 8;
+const TOP_PADDING = 50;
+const BOTTOM_PADDING = 50;
+
+function ConnectionPoint({
+  side,
+  pointRef,
+}: {
+  side: "left" | "right";
+  pointRef: (element: HTMLSpanElement | null) => void;
+}) {
   return (
-    <>
-      <path d={path} fill="none" stroke="#777" strokeWidth="1.5" />
-
-      <circle r="2.5" fill="#d4d4d4">
-        <animateMotion dur="2.4s" repeatCount="indefinite" path={path} />
-      </circle>
-
-      <circle r="2" fill="#999" opacity="0.7">
-        <animateMotion
-          dur="2.4s"
-          begin="0.8s"
-          repeatCount="indefinite"
-          path={path}
-        />
-      </circle>
-    </>
+    <span
+      ref={pointRef}
+      className={[
+        "absolute top-1/2 h-3 w-3 -translate-y-1/2",
+        "rounded-full border border-neutral-300 bg-[#202020]",
+        side === "left" ? "-right-1.5" : "-left-1.5",
+      ].join(" ")}
+    />
   );
 }
 
 export function GrasshopperComponent({ component }: Props) {
-  const inputCount = component.inputs.length;
-  const outputCount = component.outputs.length;
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const rows = Math.max(inputCount, outputCount, 1);
-
-  const rowHeight = 72;
-  const nodeHeight = Math.max(150, rows * rowHeight + 70);
-
-  const width = 900;
-
-  const inputX = 285;
-  const nodeLeft = 365;
-  const nodeRight = 535;
-  const outputX = 615;
-
-  const nodeCenterY = nodeHeight / 2;
+  const inputCardRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const outputCardRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const nodeInputRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const nodeOutputRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-neutral-800 bg-[#242424] p-8 shadow-2xl">
+    <div className="hidden w-full min-w-0 overflow-hidden rounded-2xl border border-neutral-800 bg-[#202020] p-4 sm:p-6 xl:block">
       <div
-        className="relative mx-auto"
-        style={{
-          width,
-          height: nodeHeight,
-        }}
+        ref={containerRef}
+        className="relative flex w-full min-w-0 items-center justify-between"
       >
-        {/* Wires */}
-        <svg
-          className="pointer-events-none absolute inset-0 h-full w-full"
-          viewBox={`0 0 ${width} ${nodeHeight}`}
-          fill="none"
+        <WireLayer
+          componentId={component.id}
+          containerRef={containerRef}
+          inputCardRefs={inputCardRefs}
+          outputCardRefs={outputCardRefs}
+          nodeInputRefs={nodeInputRefs}
+          nodeOutputRefs={nodeOutputRefs}
+          inputCount={component.inputs.length}
+          outputCount={component.outputs.length}
+        />
+
+        {/* INPUT DOCUMENTATION */}
+        <div
+          className="left-0 top-0 z-10 h-full"
+          style={{
+            width: "29%",
+          }}
         >
-          {component.inputs.map((input, index) => {
-            const y = 45 + index * rowHeight;
-
-            const path = `
-              M ${inputX} ${y}
-              C ${inputX + 45} ${y},
-                ${nodeLeft - 45} ${nodeCenterY},
-                ${nodeLeft} ${nodeCenterY}
-            `;
-
-            return <Wire key={`input-wire-${input.name}`} path={path} />;
-          })}
-
-          {component.outputs.map((output, index) => {
-            const y = 45 + index * rowHeight;
-
-            const path = `
-              M ${nodeRight} ${nodeCenterY}
-              C ${nodeRight + 45} ${nodeCenterY},
-                ${outputX - 45} ${y},
-                ${outputX} ${y}
-            `;
-
-            return <Wire key={`output-wire-${output.name}`} path={path} />;
-          })}
-        </svg>
-
-        {/* Inputs */}
-        <div className="absolute left-0 top-0 w-[285px]">
-          <div className="space-y-[16px]">
-            {component.inputs.map((input) => (
+          <div className="flex h-full flex-col justify-between gap-2">
+            {component.inputs.map((input, index) => (
               <div
                 key={input.name}
-                className="relative h-14 rounded-md border border-neutral-600 bg-[#303030] px-3 py-2 text-white shadow-sm"
+                className="relative rounded-md border border-neutral-600 bg-[#303030] px-3 py-2 text-white shadow-sm"
               >
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm">{input.name}</span>
+                <ConnectionPoint
+                  side="left"
+                  pointRef={(element) => {
+                    inputCardRefs.current[index] = element;
+                  }}
+                />
 
-                  <span className="rounded bg-neutral-600 px-1.5 py-0.5 text-[10px] text-neutral-200">
-                    {input.access}
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="truncate text-sm font-semibold">
+                    {input.name}
                   </span>
 
                   {input.optional && (
-                    <span className="text-[10px] text-neutral-500">
+                    <span className="shrink-0 text-[10px] text-neutral-500">
                       optional
                     </span>
                   )}
                 </div>
 
-                <div className="mt-1 text-xs text-neutral-400">
-                  {input.nickname} · {input.type}
+                <div className="mt-1 truncate text-xs text-neutral-400">
+                  {input.nickname} · {input.type} · {input.access}
                 </div>
 
-                <p className="mt-1 text-[11px] leading-tight text-neutral-400">
+                <p className="mt-1 line-clamp-2 text-[11px] leading-tight text-neutral-400">
                   {input.description}
                 </p>
-
-                <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border border-neutral-400 bg-[#242424]" />
               </div>
             ))}
           </div>
         </div>
 
-        {/* Main Node */}
-        <div
-          className="absolute left-[365px] top-1/2 w-[170px] -translate-y-1/2 overflow-hidden rounded-md border border-neutral-500 bg-[#303030] shadow-xl"
-          style={{
-            height: Math.min(nodeHeight - 20, 220),
-          }}
-        >
-          <div className="relative flex h-full flex-col">
-            {/* Icon */}
-            <div className="flex flex-1 items-center justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-md bg-[#1f1f1f]">
+        {/* GRASSHOPPER NODE */}
+        <div className="z-20 overflow-visible rounded-2xl border border-neutral-500 bg-[#353535] shadow-xl">
+          {/* Header */}
+          <div
+            className="flex items-center justify-center rounded-t-2xl border-b border-neutral-500 bg-[#414141] px-2"
+            style={{ height: HEADER_HEIGHT }}
+          >
+            <span className="truncate text-xs font-semibold text-neutral-200">
+              {component.nickname}
+            </span>
+          </div>
+
+          {/* Body */}
+          <div className="relative flex items-center gap-3">
+            <div>
+              {component.inputs.map((input, index) => (
+                <div
+                  key={`node-input-${input.name}`}
+                  className="relative px-4 py-2 bg"
+                >
+                  <ConnectionPoint
+                    side="right"
+                    pointRef={(element) => {
+                      nodeInputRefs.current[index] = element;
+                    }}
+                  />
+
+                  <span className="pl-3 text-sm font-semibold text-neutral-200">
+                    {input.nickname}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Center icon */}
+            <div className="pointer-events-none my-4 flex items-center justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-[#242424]">
                 <img
                   src={`${ICON_BASE}${component.icon}`}
                   alt={component.name}
-                  className="h-11 w-11 object-contain"
+                  className="h-12 w-12 object-contain"
                 />
               </div>
             </div>
 
-            {/* Vertical Name */}
-            <div className="absolute inset-y-0 left-1/2 flex -translate-x-1/2 items-center justify-center">
-              <span
-                className="select-none text-sm font-semibold tracking-wide text-white"
-                style={{
-                  writingMode: "vertical-rl",
-                  transform: "rotate(180deg)",
-                }}
-              >
-                {component.name}
-              </span>
-            </div>
+            <div>
+              {component.outputs.map((output, index) => (
+                <div
+                  key={`node-output-${output.name}`}
+                  className="relative px-4 py-2"
+                >
+                  <ConnectionPoint
+                    side="left"
+                    pointRef={(element) => {
+                      nodeOutputRefs.current[index] = element;
+                    }}
+                  />
 
-            {/* Nickname */}
-            <div className="border-t border-neutral-600 px-3 py-2 text-center text-xs text-neutral-300">
-              {component.nickname}
+                  <span className="pr-3 text-sm font-semibold text-neutral-200">
+                    {output.nickname}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Input connection points */}
-          {component.inputs.map((input, index) => {
-            const relativeY = 45 + index * rowHeight - nodeCenterY;
-
-            return (
-              <span
-                key={`node-input-${input.name}`}
-                className="absolute -left-1.5 h-3 w-3 rounded-full border border-neutral-400 bg-[#242424]"
-                style={{
-                  top: `calc(50% + ${relativeY}px)`,
-                }}
-              />
-            );
-          })}
-
-          {/* Output connection points */}
-          {component.outputs.map((output, index) => {
-            const relativeY = 45 + index * rowHeight - nodeCenterY;
-
-            return (
-              <span
-                key={`node-output-${output.name}`}
-                className="absolute -right-1.5 h-3 w-3 rounded-full border border-neutral-400 bg-[#242424]"
-                style={{
-                  top: `calc(50% + ${relativeY}px)`,
-                }}
-              />
-            );
-          })}
+          {/* Footer */}
+          <div
+            className="flex items-center justify-center rounded-b-2xl border-t border-neutral-500 bg-[#303030] px-2"
+            style={{ height: FOOTER_HEIGHT }}
+          >
+            <span className="truncate text-xs font-semibold text-white">
+              {component.name}
+            </span>
+          </div>
         </div>
 
-        {/* Outputs */}
-        <div className="absolute right-0 top-0 w-[285px]">
-          <div className="space-y-[16px]">
-            {component.outputs.map((output) => (
+        {/* OUTPUT DOCUMENTATION */}
+        <div
+          className="right-0 top-0 z-10"
+          style={{
+            width: "29%",
+          }}
+        >
+          <div className="flex flex-col gap-2">
+            {component.outputs.map((output, index) => (
               <div
                 key={output.name}
-                className="relative h-14 rounded-md border border-neutral-600 bg-[#303030] px-3 py-2 text-white shadow-sm"
+                className="relative rounded-md border border-neutral-600 bg-[#303030] px-3 py-2 text-white shadow-sm"
               >
-                <div className="flex items-center justify-end gap-2">
-                  <span className="rounded bg-neutral-600 px-1.5 py-0.5 text-[10px] text-neutral-200">
-                    {output.access}
-                  </span>
+                <ConnectionPoint
+                  side="right"
+                  pointRef={(element) => {
+                    outputCardRefs.current[index] = element;
+                  }}
+                />
 
-                  <span className="font-semibold text-sm">{output.name}</span>
+                <div className="truncate text-sm font-semibold">
+                  {output.name}
                 </div>
 
-                <div className="mt-1 text-right text-xs text-neutral-400">
-                  {output.nickname} · {output.type}
+                <div className="mt-1 truncate text-xs text-neutral-400">
+                  {output.nickname} · {output.type} · {output.access}
                 </div>
 
-                <p className="mt-1 text-right text-[11px] leading-tight text-neutral-400">
+                <p className="mt-1 line-clamp-2 text-[11px] leading-tight text-neutral-400">
                   {output.description}
                 </p>
-
-                <span className="absolute -left-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border border-neutral-400 bg-[#242424]" />
               </div>
             ))}
           </div>
