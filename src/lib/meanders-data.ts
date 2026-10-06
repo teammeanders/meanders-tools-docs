@@ -16,3 +16,20 @@ export async function getComponents(): Promise<ComponentsData> {
 
   return response.json();
 }
+
+export function groupComponents(components: ComponentsData["components"]) {
+  return Object.entries(
+    components.reduce<Record<string, ComponentsData["components"]>>(
+      (acc, component) => {
+        acc[component.subcategory] ??= [];
+        acc[component.subcategory].push(component);
+
+        return acc;
+      },
+      {},
+    ),
+  ).map(([name, components]) => ({
+    name,
+    components: components.sort((a, b) => a.name.localeCompare(b.name)),
+  }));
+}
