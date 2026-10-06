@@ -101,6 +101,13 @@ export function MobileMenu({ groups }: Props) {
           >
             Download
           </Link>
+          <Link
+            href="/installation"
+            onClick={close}
+            className="block rounded-md px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
+          >
+            Installation
+          </Link>
         </nav>
 
         {/* Documentation */}

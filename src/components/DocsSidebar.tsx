@@ -40,6 +40,12 @@ export async function DocsSidebar() {
           >
             Download
           </Link>
+          <Link
+            href="/installation"
+            className="block rounded-md px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
+          >
+            Installation
+          </Link>
         </div>
 
         {/* Documentation */}

@@ -1,4 +1,5 @@
 "use client";
+
 import { useRef } from "react";
 import type { MeandersComponent } from "@/types/meanders";
 import { WireLayer } from "@/components/WireLayer";
@@ -22,7 +23,7 @@ function ConnectionPoint({
       ref={pointRef}
       className={[
         "absolute top-1/2 h-3 w-3 -translate-y-1/2",
-        "rounded-full border border-neutral-300 bg-[#202020]",
+        "rounded-full border border-[var(--color-border)] bg-[var(--color-bg)]",
         side === "left" ? "-right-1.5" : "-left-1.5",
       ].join(" ")}
     />
@@ -33,12 +34,15 @@ export function GrasshopperComponent({ component }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const inputCardRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
   const outputCardRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
   const nodeInputRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
   const nodeOutputRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
   return (
-    <div className="hidden w-full min-w-0 overflow-hidden rounded-2xl border border-neutral-800 bg-[#202020] p-4 sm:p-6 xl:block">
+    <div className="hidden w-full min-w-0 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 sm:p-6 xl:block">
       <div
         ref={containerRef}
         className="relative flex w-full min-w-0 items-center justify-between"
@@ -65,7 +69,7 @@ export function GrasshopperComponent({ component }: Props) {
             {component.inputs.map((input, index) => (
               <div
                 key={input.name}
-                className="relative rounded-md border border-neutral-600 bg-[#303030] px-3 py-2 text-white shadow-sm"
+                className="relative rounded-md border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 py-2 text-[var(--color-text)] shadow-sm"
               >
                 <ConnectionPoint
                   side="left"
@@ -80,17 +84,17 @@ export function GrasshopperComponent({ component }: Props) {
                   </span>
 
                   {input.optional && (
-                    <span className="shrink-0 text-[10px] text-neutral-500">
+                    <span className="shrink-0 text-[10px] text-[var(--color-text-muted)]">
                       optional
                     </span>
                   )}
                 </div>
 
-                <div className="mt-1 truncate text-xs text-neutral-400">
+                <div className="mt-1 truncate text-xs text-[var(--color-text-muted)]">
                   {input.nickname} · {input.type} · {input.access}
                 </div>
 
-                <p className="mt-1 line-clamp-2 text-[11px] leading-tight text-neutral-400">
+                <p className="mt-1 line-clamp-2 text-[11px] leading-tight text-[var(--color-text-secondary)]">
                   {input.description}
                 </p>
               </div>
@@ -99,10 +103,10 @@ export function GrasshopperComponent({ component }: Props) {
         </div>
 
         {/* GRASSHOPPER NODE */}
-        <div className="z-20 overflow-visible rounded-2xl border border-neutral-500 bg-[#353535] shadow-xl">
+        <div className="z-20 overflow-visible rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-xl">
           {/* Header */}
-          <div className="flex items-center justify-center rounded-t-2xl border-b border-neutral-500 bg-[#414141] px-2">
-            <span className="truncate text-xs font-semibold text-neutral-200">
+          <div className="flex items-center justify-center rounded-t-2xl border-b border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-3">
+            <span className="truncate text-xs font-semibold text-[var(--color-text)]">
               {component.nickname}
             </span>
           </div>
@@ -113,7 +117,7 @@ export function GrasshopperComponent({ component }: Props) {
               {component.inputs.map((input, index) => (
                 <div
                   key={`node-input-${input.name}`}
-                  className="relative px-4 py-2 bg"
+                  className="relative px-4 py-2"
                 >
                   <ConnectionPoint
                     side="right"
@@ -122,7 +126,7 @@ export function GrasshopperComponent({ component }: Props) {
                     }}
                   />
 
-                  <span className="pl-3 text-sm font-semibold text-neutral-200">
+                  <span className="pl-3 text-sm font-semibold text-[var(--color-text)]">
                     {input.nickname}
                   </span>
                 </div>
@@ -131,7 +135,7 @@ export function GrasshopperComponent({ component }: Props) {
 
             {/* Center icon */}
             <div className="pointer-events-none my-4 flex items-center justify-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-[#242424]">
+              <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-bg)]">
                 <img
                   src={`${ICON_BASE}${component.icon}`}
                   alt={component.name}
@@ -153,7 +157,7 @@ export function GrasshopperComponent({ component }: Props) {
                     }}
                   />
 
-                  <span className="pr-3 text-sm font-semibold text-neutral-200">
+                  <span className="pr-3 text-sm font-semibold text-[var(--color-text)]">
                     {output.nickname}
                   </span>
                 </div>
@@ -162,8 +166,8 @@ export function GrasshopperComponent({ component }: Props) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-center rounded-b-2xl border-t border-neutral-500 bg-[#303030] px-2">
-            <span className="truncate text-xs font-semibold text-white">
+          <div className="flex items-center justify-center rounded-b-2xl border-t border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-3">
+            <span className="truncate text-xs font-semibold text-[var(--color-text)]">
               {component.name}
             </span>
           </div>
@@ -180,7 +184,7 @@ export function GrasshopperComponent({ component }: Props) {
             {component.outputs.map((output, index) => (
               <div
                 key={output.name}
-                className="relative rounded-md border border-neutral-600 bg-[#303030] px-3 py-2 text-white shadow-sm"
+                className="relative rounded-md border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-3 py-2 text-[var(--color-text)] shadow-sm"
               >
                 <ConnectionPoint
                   side="right"
@@ -193,11 +197,11 @@ export function GrasshopperComponent({ component }: Props) {
                   {output.name}
                 </div>
 
-                <div className="mt-1 truncate text-xs text-neutral-400">
+                <div className="mt-1 truncate text-xs text-[var(--color-text-muted)]">
                   {output.nickname} · {output.type} · {output.access}
                 </div>
 
-                <p className="mt-1 line-clamp-2 text-[11px] leading-tight text-neutral-400">
+                <p className="mt-1 line-clamp-2 text-[11px] leading-tight text-[var(--color-text-secondary)]">
                   {output.description}
                 </p>
               </div>

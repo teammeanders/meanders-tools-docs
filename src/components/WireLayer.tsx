@@ -61,12 +61,12 @@ function AnimatedWire({
       <path
         d={path}
         fill="none"
-        stroke="#777"
+        stroke="var(--color-border)"
         strokeWidth="2"
         strokeLinecap="round"
       />
 
-      <circle r="3" fill="#e5e5e5">
+      <circle r="3" fill="var(--color-accent)">
         <animateMotion
           dur="2.2s"
           begin={reverse ? "1.1s" : "0s"}
@@ -75,7 +75,7 @@ function AnimatedWire({
         />
       </circle>
 
-      <circle r="2" fill="#a3a3a3">
+      <circle r="2" fill="var(--color-accent-hover)">
         <animateMotion
           dur="2.2s"
           begin={reverse ? "1.65s" : "0.55s"}
@@ -98,6 +98,7 @@ export function WireLayer({
   outputCount,
 }: WireLayerProps) {
   const [wires, setWires] = useState<Wire[]>([]);
+
   const [size, setSize] = useState({
     width: 1,
     height: 1,
@@ -192,11 +193,9 @@ export function WireLayer({
       measure();
     };
 
-    // Give React one frame to commit the new component DOM.
     frame = requestAnimationFrame(() => {
       observeElements();
 
-      // Extra passes handle images, fonts and flex layout settling.
       window.setTimeout(measure, 30);
       window.setTimeout(measure, 120);
       window.setTimeout(measure, 300);
@@ -214,6 +213,7 @@ export function WireLayer({
       }
 
       observer.disconnect();
+
       window.removeEventListener("resize", measure);
     };
   }, [

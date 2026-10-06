@@ -6,18 +6,24 @@ type Props = {
 
 export function ComponentCard({ component }: Props) {
   return (
-    <article className="rounded-xl border border-neutral-200 p-5">
-      <div className="text-xs text-neutral-500">{component.subcategory}</div>
+    <article className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 transition-colors hover:border-[var(--color-accent-border)] hover:bg-[var(--color-surface-elevated)]">
+      <div className="text-xs font-medium text-[var(--color-text-muted)]">
+        {component.subcategory}
+      </div>
 
-      <h2 className="mt-2 text-xl font-semibold">{component.name}</h2>
+      <h2 className="mt-2 text-xl font-semibold text-[var(--color-text)]">
+        {component.name}
+      </h2>
 
-      <p className="mt-2 text-sm text-neutral-600">
+      <p className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
         {component.description.short}
       </p>
 
-      <div className="mt-4 flex gap-2 text-xs text-neutral-500">
+      <div className="mt-4 flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
         <span>{component.nickname}</span>
-        <span>•</span>
+
+        <span className="text-[var(--color-border)]">•</span>
+
         <span>v{component.introducedIn}</span>
       </div>
     </article>
