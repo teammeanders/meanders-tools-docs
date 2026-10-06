@@ -1,40 +1,59 @@
 import Link from "next/link";
 import { getComponents } from "@/lib/meanders-data";
+import { DocumentationNav } from "@/components/DocumentationNav";
 
 export async function DocsSidebar() {
   const data = await getComponents();
 
-  const groups = Object.groupBy(
-    data.components,
-    (component) => component.subcategory,
+  const groups = data.components.reduce<Record<string, typeof data.components>>(
+    (acc, component) => {
+      acc[component.subcategory] ??= [];
+      acc[component.subcategory].push(component);
+
+      return acc;
+    },
+    {},
   );
 
   return (
-    <aside className="sticky top-0 h-screen w-72 shrink-0 border-r border-neutral-200 bg-white p-6">
-      <Link href="/" className="text-lg font-semibold">
-        Meanders.Tools
-      </Link>
+    <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-[var(--sidebar-width)] shrink-0 overflow-y-auto border-r border-[var(--color-border)] bg-[var(--color-surface)] lg:block">
+      <nav className="px-4 py-6">
+        {/* Main navigation */}
+        <div className="space-y-1">
+          <Link
+            href="/"
+            className="block rounded-md px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
+          >
+            Home
+          </Link>
 
-      <nav className="mt-8 space-y-7">
-        {Object.entries(groups).map(([category, components]) => (
-          <div key={category}>
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-neutral-400">
-              {category}
-            </div>
+          <Link
+            href="/changelog"
+            className="block rounded-md px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
+          >
+            Changelog
+          </Link>
 
-            <div className="space-y-1">
-              {components?.map((component) => (
-                <Link
-                  key={component.id}
-                  href={`/components/${component.id}`}
-                  className="block rounded-md px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
-                >
-                  {component.name}
-                </Link>
-              ))}
-            </div>
-          </div>
-        ))}
+          <Link
+            href="/download"
+            className="block rounded-md px-3 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
+          >
+            Download
+          </Link>
+        </div>
+
+        {/* Documentation */}
+        <DocumentationNav
+          groups={Object.entries(groups).map(([name, components]) => ({
+            name,
+            components: components
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((component) => ({
+                id: component.id,
+                name: component.name,
+              })),
+          }))}
+        />
       </nav>
     </aside>
   );

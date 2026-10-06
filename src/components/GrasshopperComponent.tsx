@@ -10,13 +10,6 @@ type Props = {
 const ICON_BASE =
   "https://raw.githubusercontent.com/teammeanders/Meanders.Tools/master/assets/icons/";
 
-const HEADER_HEIGHT = 44;
-const FOOTER_HEIGHT = 40;
-const PORT_ROW_HEIGHT = 40;
-const BODY_PADDING = 8;
-const TOP_PADDING = 50;
-const BOTTOM_PADDING = 50;
-
 function ConnectionPoint({
   side,
   pointRef,
@@ -108,10 +101,7 @@ export function GrasshopperComponent({ component }: Props) {
         {/* GRASSHOPPER NODE */}
         <div className="z-20 overflow-visible rounded-2xl border border-neutral-500 bg-[#353535] shadow-xl">
           {/* Header */}
-          <div
-            className="flex items-center justify-center rounded-t-2xl border-b border-neutral-500 bg-[#414141] px-2"
-            style={{ height: HEADER_HEIGHT }}
-          >
+          <div className="flex items-center justify-center rounded-t-2xl border-b border-neutral-500 bg-[#414141] px-2">
             <span className="truncate text-xs font-semibold text-neutral-200">
               {component.nickname}
             </span>
@@ -172,10 +162,7 @@ export function GrasshopperComponent({ component }: Props) {
           </div>
 
           {/* Footer */}
-          <div
-            className="flex items-center justify-center rounded-b-2xl border-t border-neutral-500 bg-[#303030] px-2"
-            style={{ height: FOOTER_HEIGHT }}
-          >
+          <div className="flex items-center justify-center rounded-b-2xl border-t border-neutral-500 bg-[#303030] px-2">
             <span className="truncate text-xs font-semibold text-white">
               {component.name}
             </span>
