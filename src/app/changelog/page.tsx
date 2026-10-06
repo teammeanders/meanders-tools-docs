@@ -1,4 +1,5 @@
 import { getChangelog } from "@/lib/changelog";
+import { ChangelogRenderer } from "@/components/ChangelogRenderer";
 
 export default async function ChangelogPage() {
   const changelog = await getChangelog();
@@ -18,9 +19,7 @@ export default async function ChangelogPage() {
       </header>
 
       <article className="mt-12 max-w-4xl">
-        <pre className="whitespace-pre-wrap font-sans text-sm leading-7 text-[var(--color-text-secondary)]">
-          {changelog}
-        </pre>
+        <ChangelogRenderer content={changelog} />
       </article>
     </main>
   );
