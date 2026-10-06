@@ -69,7 +69,7 @@ export default async function InstallationPage() {
 
         <Link
           href="/download"
-          className="mt-5 inline-flex rounded-md bg-[var(--color-accent)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-accent-hover)]"
+          className="mt-5 inline-flex rounded-md bg-[var(--color-accent)] px-4 py-2 text-sm font-semibold text-[var(--color-accent-foreground)] transition-colors hover:bg-[var(--color-accent-hover)]"
         >
           Download {version}
         </Link>

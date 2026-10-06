@@ -23,7 +23,7 @@ export function Header() {
 
           <a
             href="https://tools.meanders-dfh.com/download"
-            className="rounded-md border border-[var(--color-accent-border)] bg-[var(--color-accent-soft)] px-3 py-1.5 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)] hover:text-[var(--color-bg)]"
+            className="rounded-md border border-[var(--color-accent-border)] bg-[var(--color-accent-soft)] px-3 py-1.5 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-foreground)]"
           >
             Download
           </a>

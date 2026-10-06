@@ -28,15 +28,12 @@
 
   /* Teal Accent */
 
-  --color-accent: #0e7490;
-
-  --color-accent-hover: #14b8a6;
-
-  --color-accent-light: #ccf3f0;
-
-  --color-accent-soft: rgb(14 116 144 / 10%);
-
-  --color-accent-border: rgb(14 116 144 / 35%);
+  --color-accent: #f59e0b;
+  --color-accent-hover: #fbbf24;
+  --color-accent-light: #fef3c7;
+  --color-accent-foreground: #111111;
+  --color-accent-soft: rgb(245 158 11 / 10%);
+  --color-accent-border: rgb(245 158 11 / 35%);
 
   /* ==================================================
      Typography
@@ -126,9 +123,18 @@ body {
    Links
    ================================================== */
 
-a {
-  color: inherit;
-  text-decoration: none;
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
 }
 
 /* ==================================================

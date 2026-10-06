@@ -23,7 +23,7 @@ export function DocumentationNav({ groups }: Props) {
   return (
     <nav>
       {/* Top-level section */}
-      <details open className="group">
+      <details className="group">
         <summary className="flex cursor-pointer list-none items-center justify-between rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text)] transition-colors hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]">
           <span>Documentation</span>
 

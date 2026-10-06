@@ -31,7 +31,7 @@ export default async function Home() {
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
               href="/components/me-attribute"
-              className="rounded-md bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--color-accent-hover)]"
+              className="rounded-md bg-[var(--color-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--color-accent-foreground)] transition-colors hover:bg-[var(--color-accent-hover)]"
             >
               Explore Documentation
             </Link>
@@ -92,7 +92,7 @@ export default async function Home() {
 
           <Link
             href="/download"
-            className="inline-flex w-fit rounded-md border border-[var(--color-accent-border)] bg-[var(--color-accent-soft)] px-4 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)] hover:text-white"
+            className="inline-flex w-fit rounded-md border border-[var(--color-accent-border)] bg-[var(--color-accent-soft)] px-4 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[var(--color-accent)]  hover:text-[var(--color-accent-foreground)]"
           >
             View release
           </Link>
@@ -202,7 +202,7 @@ export default async function Home() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 href="/download"
-                className="rounded-md bg-[var(--color-accent)] px-4 py-2 text-sm font-semibold text-white hover:bg-[var(--color-accent-hover)]"
+                className="rounded-md bg-[var(--color-accent)] px-4 py-2 text-sm font-semibold text-[var(--color-accent-foreground)] hover:bg-[var(--color-accent-hover)]"
               >
                 Download
               </Link>
