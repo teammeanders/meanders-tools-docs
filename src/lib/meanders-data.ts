@@ -11,6 +11,7 @@ export interface PluginData {
   id: string;
   name: string;
   displayName: string;
+
   version: string;
   status: string;
 
@@ -103,7 +104,23 @@ export function groupComponents(components: ComponentsData["components"]) {
     ),
   ).map(([name, components]) => ({
     name,
-
     components: components.sort((a, b) => a.name.localeCompare(b.name)),
+  }));
+}
+
+export function groupParameters(parameters: ComponentsData["parameters"]) {
+  return Object.entries(
+    parameters.reduce<Record<string, ComponentsData["parameters"]>>(
+      (acc, parameter) => {
+        acc[parameter.subcategory] ??= [];
+        acc[parameter.subcategory].push(parameter);
+
+        return acc;
+      },
+      {},
+    ),
+  ).map(([name, parameters]) => ({
+    name,
+    parameters: parameters.sort((a, b) => a.name.localeCompare(b.name)),
   }));
 }

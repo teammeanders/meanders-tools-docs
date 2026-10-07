@@ -14,6 +14,20 @@ export interface ComponentDescription {
   long: string;
 }
 
+export interface ComponentSetting {
+  name: string;
+  type: string;
+  persistent?: boolean;
+  options?: string[];
+}
+
+export interface ComponentExample {
+  title: string;
+  description: string;
+  input?: unknown;
+  output?: unknown;
+}
+
 export interface MeandersComponent {
   id: string;
   guid: string;
@@ -27,13 +41,37 @@ export interface MeandersComponent {
   icon: string;
   inputs: Port[];
   outputs: Port[];
-  settings: unknown[];
+  settings: ComponentSetting[];
   errors: string[];
-  examples: unknown[];
+  examples: ComponentExample[];
+  notes: string[];
+  related: string[];
+}
+
+export interface MeandersParameter {
+  id: string;
+  guid: string;
+  name: string;
+  nickname: string;
+  category: string;
+  subcategory: string;
+  status: string;
+  introducedIn: string;
+  description: ComponentDescription;
+  icon: string;
+  access: PortAccess;
+  type: string;
+  settings: ComponentSetting[];
+  examples: ComponentExample[];
   notes: string[];
   related: string[];
 }
 
 export interface ComponentsData {
+  $schema?: string;
+  _generated?: boolean;
+  _generatedAt?: string;
+
   components: MeandersComponent[];
+  parameters: MeandersParameter[];
 }
