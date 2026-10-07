@@ -3,7 +3,11 @@ import "./globals.css";
 import { DocsSidebar } from "@/components/DocsSidebar";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { getComponents, groupComponents } from "@/lib/meanders-data";
+import {
+  getComponents,
+  groupComponents,
+  groupParameters,
+} from "@/lib/meanders-data";
 import { MobileMenu } from "@/components/MobileMenu";
 
 export const metadata: Metadata = {
@@ -17,14 +21,19 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const data = await getComponents();
-  const groups = groupComponents(data.components);
+
+  const componentGroups = groupComponents(data.components);
+
+  const parameterGroups = groupParameters(data.parameters);
 
   return (
     <html lang="en">
       <body>
         <Header />
-
-        <MobileMenu groups={groups} />
+        <MobileMenu
+          componentGroups={componentGroups}
+          parameterGroups={parameterGroups}
+        />
 
         <div className="flex min-h-[calc(100vh-4rem)]">
           <DocsSidebar />

@@ -1,31 +1,95 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 type ComponentItem = {
   id: string;
   name: string;
 };
 
-type Group = {
+type ComponentGroup = {
   name: string;
   components: ComponentItem[];
 };
 
-type Props = {
-  groups: Group[];
+type ParameterItem = {
+  id: string;
+  name: string;
 };
 
-export function MobileMenu({ groups }: Props) {
+type ParameterGroup = {
+  name: string;
+  parameters: ParameterItem[];
+};
+
+type DocumentationItem = {
+  id: string;
+  name: string;
+  type: "component" | "parameter";
+};
+
+type DocumentationGroup = {
+  name: string;
+  items: DocumentationItem[];
+};
+
+type Props = {
+  componentGroups: ComponentGroup[];
+  parameterGroups: ParameterGroup[];
+};
+
+export function MobileMenu({ componentGroups, parameterGroups }: Props) {
   const [open, setOpen] = useState(false);
-  const [docsOpen, setDocsOpen] = useState(true);
+  const [docsOpen, setDocsOpen] = useState(false);
+
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
   const pathname = usePathname();
 
   const close = () => setOpen(false);
+
+  /*
+   * Merge Components and Parameters into the same
+   * documentation hierarchy.
+   */
+  const groups = new Map<string, DocumentationItem[]>();
+
+  for (const group of componentGroups) {
+    const items = groups.get(group.name) ?? [];
+
+    items.push(
+      ...group.components.map((component) => ({
+        id: component.id,
+        name: component.name,
+        type: "component" as const,
+      })),
+    );
+
+    groups.set(group.name, items);
+  }
+
+  for (const group of parameterGroups) {
+    const items = groups.get(group.name) ?? [];
+
+    items.push(
+      ...group.parameters.map((parameter) => ({
+        id: parameter.id,
+        name: parameter.name,
+        type: "parameter" as const,
+      })),
+    );
+
+    groups.set(group.name, items);
+  }
+
+  const documentationGroups: DocumentationGroup[] = Array.from(groups.entries())
+    .map(([name, items]) => ({
+      name,
+      items: items.sort((a, b) => a.name.localeCompare(b.name)),
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="lg:hidden">
@@ -87,6 +151,14 @@ export function MobileMenu({ groups }: Props) {
           </Link>
 
           <Link
+            href="/installation"
+            onClick={close}
+            className="block rounded-md px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
+          >
+            Installation
+          </Link>
+
+          <Link
             href="/changelog"
             onClick={close}
             className="block rounded-md px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
@@ -101,21 +173,14 @@ export function MobileMenu({ groups }: Props) {
           >
             Download
           </Link>
-          <Link
-            href="/installation"
-            onClick={close}
-            className="block rounded-md px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
-          >
-            Installation
-          </Link>
         </nav>
 
         {/* Documentation */}
-        <div className="mt-7">
+        <div>
           <button
             type="button"
             onClick={() => setDocsOpen((value) => !value)}
-            className="flex w-full items-center justify-between rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-elevated)] px-3 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-text-secondary)]"
+            className="flex w-full items-center justify-between rounded-lg py-2 px-3 text-xs font-semibold  text-[var(--color-text-secondary)]"
           >
             <span>Documentation</span>
 
@@ -128,8 +193,8 @@ export function MobileMenu({ groups }: Props) {
 
           {docsOpen && (
             <div className="mt-3 space-y-1">
-              {groups.map((group) => {
-                const isOpen = openGroups[group.name] ?? true;
+              {documentationGroups.map((group) => {
+                const isOpen = openGroups[group.name] ?? false;
 
                 return (
                   <div key={group.name}>
@@ -156,14 +221,18 @@ export function MobileMenu({ groups }: Props) {
 
                     {isOpen && (
                       <div className="ml-2 border-l border-[var(--color-border-subtle)] pl-2">
-                        {group.components.map((component) => {
-                          const active =
-                            pathname === `/components/${component.id}`;
+                        {group.items.map((item) => {
+                          const href =
+                            item.type === "component"
+                              ? `/components/${item.id}`
+                              : `/parameters/${item.id}`;
+
+                          const active = pathname === href;
 
                           return (
                             <Link
-                              key={component.id}
-                              href={`/components/${component.id}`}
+                              key={`${item.type}-${item.id}`}
+                              href={href}
                               onClick={close}
                               className={`block rounded-md px-3 py-2 text-sm ${
                                 active
@@ -171,7 +240,7 @@ export function MobileMenu({ groups }: Props) {
                                   : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
                               }`}
                             >
-                              {component.name}
+                              {item.name}
                             </Link>
                           );
                         })}

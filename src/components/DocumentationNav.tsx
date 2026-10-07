@@ -105,7 +105,7 @@ export function DocumentationNav({ componentGroups, parameterGroups }: Props) {
   return (
     <nav>
       <details className="group">
-        <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-surface-elevated)] px-3 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-accent-border)] hover:text-[var(--color-accent)]">
+        <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg  px-3 py-2.5 text-sm font-semibold text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-accent-border)] hover:text-[var(--color-accent)]">
           <span>Documentation</span>
 
           <span className="text-sm transition-transform group-open:rotate-90">
@@ -137,7 +137,7 @@ export function DocumentationNav({ componentGroups, parameterGroups }: Props) {
                     <Link
                       key={`${item.type}-${item.id}`}
                       href={href}
-                      className={`block rounded-md px-3 py-1.5 text-sm transition-colors ${
+                      className={`block rounded-md px-3 py-1.5 text-xs transition-colors ${
                         active
                           ? "bg-[var(--color-accent-soft)] font-medium text-[var(--color-accent)]"
                           : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"

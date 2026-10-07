@@ -48,7 +48,7 @@ export async function DocsSidebar() {
           </Link>
         </div>
 
-        <div className="mt-5">
+        <div>
           <DocumentationNav
             componentGroups={componentGroups}
             parameterGroups={parameterGroups}
