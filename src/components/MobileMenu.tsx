@@ -167,6 +167,14 @@ export function MobileMenu({ componentGroups, parameterGroups }: Props) {
           </Link>
 
           <Link
+            href="/developers"
+            onClick={close}
+            className="block rounded-md px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
+          >
+            Developers
+          </Link>
+
+          <Link
             href="/download"
             onClick={close}
             className="block rounded-md px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
