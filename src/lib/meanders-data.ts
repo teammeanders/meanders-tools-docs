@@ -1,4 +1,4 @@
-import type { ComponentsData } from "@/types/meanders";
+import type { ComponentsData, RoadmapComponent } from "@/types/meanders";
 
 const RAW_BASE =
   "https://raw.githubusercontent.com/teammeanders/Meanders.Tools/master/";
@@ -129,37 +129,6 @@ export function groupParameters(parameters: ComponentsData["parameters"]) {
 const ROADMAP_CSV_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEKGJheipR1VayOqQDMAUFkdjau_Oqpv7cI7TGqheo3Oi8158XMR-RD8TnGXXQz-62vJcgMYIf23d_/pub?output=csv";
 
-function parseCsvLine(line: string): string[] {
-  const values: string[] = [];
-  let value = "";
-  let quoted = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-
-    if (char === '"') {
-      if (quoted && line[i + 1] === '"') {
-        value += '"';
-        i++;
-      } else {
-        quoted = !quoted;
-      }
-      continue;
-    }
-
-    if (char === "," && !quoted) {
-      values.push(value.trim());
-      value = "";
-      continue;
-    }
-
-    value += char;
-  }
-
-  values.push(value.trim());
-  return values;
-}
-
 function parseCsv(csv: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
@@ -209,18 +178,17 @@ function parseCsv(csv: string): string[][] {
   return rows;
 }
 
-export async function getRoadmapComponents(): Promise<RoadmapComponent[]> {
-  const response = await fetch(ROADMAP_CSV_URL, {
-    next: {
-      revalidate: 60,
-    },
-  });
+export async function getRoadmapWithComponents(): Promise<RoadmapComponent[]> {
+  const [csvResponse, data] = await Promise.all([
+    fetch(ROADMAP_CSV_URL, { next: { revalidate: 60 } }),
+    getComponents(),
+  ]);
 
-  if (!response.ok) {
+  if (!csvResponse.ok) {
     throw new Error("Failed to load the component roadmap.");
   }
 
-  const rows = parseCsv(await response.text());
+  const rows = parseCsv(await csvResponse.text());
 
   if (rows.length < 2) {
     return [];
@@ -240,7 +208,8 @@ export async function getRoadmapComponents(): Promise<RoadmapComponent[]> {
     );
   }
 
-  return rows.slice(1)
+  return rows
+    .slice(1)
     .map((row) => ({
       name: row[nameIndex] ?? "",
       id: row[idIndex] ?? "",
@@ -248,37 +217,15 @@ export async function getRoadmapComponents(): Promise<RoadmapComponent[]> {
     }))
     .filter((item) => item.id && item.name)
     .map((item) => {
-      const implemented = componentsCacheHasId(item.id);
+      const component = data.components.find(
+        (candidate) => candidate.id === item.id,
+      );
 
       return {
         ...item,
-        status: implemented ? "Developed" : "Planned",
-        version: implemented ? componentsCacheGetVersion(item.id) : null,
-        docsAvailable: implemented,
+        status: component ? "Developed" : "Planned",
+        version: component?.introducedIn ?? null,
+        docsAvailable: Boolean(component),
       };
     });
-}
-
-let componentsCache: ComponentsData | null = null;
-
-function componentsCacheHasId(id: string): boolean {
-  if (!componentsCache) return false;
-  return componentsCache.components.some((component) => component.id === id);
-}
-
-function componentsCacheGetVersion(id: string): string | null {
-  if (!componentsCache) return null;
-  const component = componentsCache.components.find((item) => item.id === id);
-  return component?.introducedIn ?? null;
-}
-
-export async function getRoadmapWithComponents(): Promise<RoadmapComponent[]> {
-  const data = await getComponents();
-  componentsCache = data;
-
-  try {
-    return await getRoadmapComponents();
-  } finally {
-    componentsCache = null;
-  }
 }
