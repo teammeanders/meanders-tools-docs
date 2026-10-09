@@ -124,3 +124,161 @@ export function groupParameters(parameters: ComponentsData["parameters"]) {
     parameters: parameters.sort((a, b) => a.name.localeCompare(b.name)),
   }));
 }
+
+
+const ROADMAP_CSV_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQEKGJheipR1VayOqQDMAUFkdjau_Oqpv7cI7TGqheo3Oi8158XMR-RD8TnGXXQz-62vJcgMYIf23d_/pub?output=csv";
+
+function parseCsvLine(line: string): string[] {
+  const values: string[] = [];
+  let value = "";
+  let quoted = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      if (quoted && line[i + 1] === '"') {
+        value += '"';
+        i++;
+      } else {
+        quoted = !quoted;
+      }
+      continue;
+    }
+
+    if (char === "," && !quoted) {
+      values.push(value.trim());
+      value = "";
+      continue;
+    }
+
+    value += char;
+  }
+
+  values.push(value.trim());
+  return values;
+}
+
+function parseCsv(csv: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let value = "";
+  let quoted = false;
+
+  for (let i = 0; i < csv.length; i++) {
+    const char = csv[i];
+
+    if (char === '"') {
+      if (quoted && csv[i + 1] === '"') {
+        value += '"';
+        i++;
+      } else {
+        quoted = !quoted;
+      }
+      continue;
+    }
+
+    if (char === "," && !quoted) {
+      row.push(value.trim());
+      value = "";
+      continue;
+    }
+
+    if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && csv[i + 1] === "\n") i++;
+      row.push(value.trim());
+      value = "";
+
+      if (row.some((cell) => cell.length > 0)) {
+        rows.push(row);
+      }
+
+      row = [];
+      continue;
+    }
+
+    value += char;
+  }
+
+  if (value.length > 0 || row.length > 0) {
+    row.push(value.trim());
+    if (row.some((cell) => cell.length > 0)) rows.push(row);
+  }
+
+  return rows;
+}
+
+export async function getRoadmapComponents(): Promise<RoadmapComponent[]> {
+  const response = await fetch(ROADMAP_CSV_URL, {
+    next: {
+      revalidate: 60,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to load the component roadmap.");
+  }
+
+  const rows = parseCsv(await response.text());
+
+  if (rows.length < 2) {
+    return [];
+  }
+
+  const headers = rows[0].map((header) =>
+    header.replace(/^\uFEFF/, "").trim().toLowerCase(),
+  );
+
+  const nameIndex = headers.indexOf("name");
+  const idIndex = headers.indexOf("id");
+  const categoryIndex = headers.indexOf("category");
+
+  if (nameIndex === -1 || idIndex === -1 || categoryIndex === -1) {
+    throw new Error(
+      "The component roadmap must contain Name, ID, and Category columns.",
+    );
+  }
+
+  return rows.slice(1)
+    .map((row) => ({
+      name: row[nameIndex] ?? "",
+      id: row[idIndex] ?? "",
+      category: row[categoryIndex] ?? "",
+    }))
+    .filter((item) => item.id && item.name)
+    .map((item) => {
+      const implemented = componentsCacheHasId(item.id);
+
+      return {
+        ...item,
+        status: implemented ? "Developed" : "Planned",
+        version: implemented ? componentsCacheGetVersion(item.id) : null,
+        docsAvailable: implemented,
+      };
+    });
+}
+
+let componentsCache: ComponentsData | null = null;
+
+function componentsCacheHasId(id: string): boolean {
+  if (!componentsCache) return false;
+  return componentsCache.components.some((component) => component.id === id);
+}
+
+function componentsCacheGetVersion(id: string): string | null {
+  if (!componentsCache) return null;
+  const component = componentsCache.components.find((item) => item.id === id);
+  return component?.introducedIn ?? null;
+}
+
+export async function getRoadmapWithComponents(): Promise<RoadmapComponent[]> {
+  const data = await getComponents();
+  componentsCache = data;
+
+  try {
+    return await getRoadmapComponents();
+  } finally {
+    componentsCache = null;
+  }
+}
