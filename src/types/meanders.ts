@@ -75,3 +75,13 @@ export interface ComponentsData {
   components: MeandersComponent[];
   parameters: MeandersParameter[];
 }
+
+
+export interface RoadmapComponent {
+  name: string;
+  id: string;
+  category: string;
+  status: "Developed" | "Planned";
+  version: string | null;
+  docsAvailable: boolean;
+}
