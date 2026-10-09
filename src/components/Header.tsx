@@ -12,6 +12,13 @@ export function Header() {
         </Link>
 
         <div className="hidden items-center gap-5 lg:flex">
+          <Link
+            href="/developers"
+            className="text-sm text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text)]"
+          >
+            Developers
+          </Link>
+
           <a
             href="https://github.com/teammeanders/Meanders.Tools"
             target="_blank"
