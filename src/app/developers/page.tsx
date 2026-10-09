@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import { getRoadmapWithComponents } from "@/lib/meanders-data";
 import path from "path";
 import type { ReactNode } from "react";
 
@@ -86,7 +87,7 @@ function renderLines(markdown: string): ReactNode[] {
 export default async function DevelopersPage() {
   const filePath = path.join(process.cwd(), "docs", "developers.md");
   const markdown = await fs.readFile(filePath, "utf8");
-  const content = renderLines(markdown);
+  const [content, roadmap] = await Promise.all([\n    Promise.resolve(renderLines(markdown)),\n    getRoadmapWithComponents(),\n  ]);
 
   return (
     <article className="mx-auto w-full max-w-[var(--content-max-width)] px-6 py-12 lg:px-10 lg:py-16">
@@ -98,6 +99,68 @@ export default async function DevelopersPage() {
         </p>
       </header>
       <div className="max-w-4xl">{content.slice(1)}</div>
+
+      <section className="mt-16 border-t border-[var(--color-border)] pt-10">
+        <div className="text-label text-[var(--color-accent)]">Project</div>
+        <h2 className="mt-2 text-page-heading">Component Registry</h2>
+        <p className="mt-4 max-w-3xl text-body-small text-[var(--color-text-secondary)]">
+          The roadmap is maintained in the project planning sheet. Development
+          status, version, and documentation availability are derived from the
+          component metadata in GitHub.
+        </p>
+
+        <div className="mt-8 overflow-x-auto rounded-xl border border-[var(--color-border)]">
+          <table className="w-full min-w-[720px] text-left text-sm">
+            <thead className="bg-[var(--color-surface-elevated)] text-[var(--color-text-muted)]">
+              <tr>
+                <th className="px-5 py-3 font-medium">Name</th>
+                <th className="px-5 py-3 font-medium">ID</th>
+                <th className="px-5 py-3 font-medium">Category</th>
+                <th className="px-5 py-3 font-medium">Status</th>
+                <th className="px-5 py-3 font-medium">Version</th>
+                <th className="px-5 py-3 font-medium">Docs</th>
+              </tr>
+            </thead>
+            <tbody>
+              {roadmap.map((item) => (
+                <tr key={item.id} className="border-t border-[var(--color-border)]">
+                  <td className="px-5 py-4 font-medium text-[var(--color-text)]">
+                    {item.name}
+                  </td>
+                  <td className="px-5 py-4 font-mono text-xs text-[var(--color-text-muted)]">
+                    {item.id}
+                  </td>
+                  <td className="px-5 py-4 text-[var(--color-text-secondary)]">
+                    {item.category}
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className={item.status === "Developed"
+                      ? "text-[var(--color-accent)]"
+                      : "text-[var(--color-text-muted)]"}>
+                      {item.status}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4 text-[var(--color-text-secondary)]">
+                    {item.version ?? "—"}
+                  </td>
+                  <td className="px-5 py-4">
+                    {item.docsAvailable ? (
+                      <a
+                        href={`/components/${item.id}`}
+                        className="text-[var(--color-accent)] hover:text-[var(--color-accent-hover)]"
+                      >
+                        View docs →
+                      </a>
+                    ) : (
+                      <span className="text-[var(--color-text-muted)]">—</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </article>
   );
 }
