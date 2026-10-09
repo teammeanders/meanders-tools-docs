@@ -42,7 +42,10 @@ type Props = {
 
 export function MobileMenu({ componentGroups, parameterGroups }: Props) {
   const [open, setOpen] = useState(false);
+
   const [docsOpen, setDocsOpen] = useState(false);
+
+  const [developersOpen, setDevelopersOpen] = useState(false);
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
@@ -51,8 +54,8 @@ export function MobileMenu({ componentGroups, parameterGroups }: Props) {
   const close = () => setOpen(false);
 
   /*
-   * Merge Components and Parameters into the same
-   * documentation hierarchy.
+   * Merge Components and Parameters
+   * into the same documentation hierarchy.
    */
   const groups = new Map<string, DocumentationItem[]>();
 
@@ -166,13 +169,52 @@ export function MobileMenu({ componentGroups, parameterGroups }: Props) {
             Changelog
           </Link>
 
-          <Link
-            href="/developers"
-            onClick={close}
-            className="block rounded-md px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
-          >
-            Developers
-          </Link>
+          {/* Developers */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setDevelopersOpen((value) => !value)}
+              className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
+            >
+              <span>Developers</span>
+
+              <span
+                className={`transition-transform ${
+                  developersOpen ? "rotate-90" : ""
+                }`}
+              >
+                ›
+              </span>
+            </button>
+
+            {developersOpen && (
+              <div className="mt-1 ml-2 border-l border-[var(--color-border-subtle)] pl-2">
+                <Link
+                  href="/developers"
+                  onClick={close}
+                  className={`block rounded-md px-3 py-1.5 text-sm ${
+                    pathname === "/developers"
+                      ? "bg-[var(--color-accent-soft)] font-medium text-[var(--color-accent)]"
+                      : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
+                  }`}
+                >
+                  Guide
+                </Link>
+
+                <Link
+                  href="/developers/components"
+                  onClick={close}
+                  className={`block rounded-md px-3 py-1.5 text-sm ${
+                    pathname === "/developers/components"
+                      ? "bg-[var(--color-accent-soft)] font-medium text-[var(--color-accent)]"
+                      : "text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-elevated)] hover:text-[var(--color-text)]"
+                  }`}
+                >
+                  Component Registry
+                </Link>
+              </div>
+            )}
+          </div>
 
           <Link
             href="/download"
@@ -188,7 +230,7 @@ export function MobileMenu({ componentGroups, parameterGroups }: Props) {
           <button
             type="button"
             onClick={() => setDocsOpen((value) => !value)}
-            className="flex w-full items-center justify-between rounded-lg py-2 px-3 text-xs font-semibold  text-[var(--color-text-secondary)]"
+            className="flex w-full items-center justify-between rounded-lg py-2 px-3 text-xs font-semibold text-[var(--color-text-secondary)]"
           >
             <span>Documentation</span>
 

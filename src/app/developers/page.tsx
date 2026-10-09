@@ -206,22 +206,6 @@ export default async function DevelopersPage() {
       </header>
 
       <div className="max-w-4xl">{content.slice(1)}</div>
-
-      <section className="mt-16 border-t border-[var(--color-border)] pt-10">
-        <div className="text-label text-[var(--color-accent)]">Project</div>
-
-        <h2 className="mt-2 text-page-heading">Component Registry</h2>
-
-        <p className="mt-4 max-w-3xl text-body-small text-[var(--color-text-secondary)]">
-          The roadmap is maintained in the project planning sheet. Development
-          status, version, and documentation availability are derived from the
-          component metadata in GitHub.
-        </p>
-
-        <div className="mt-8 overflow-x-auto rounded-xl border border-[var(--color-border)]">
-          <ComponentRegistryTable components={roadmap} />
-        </div>
-      </section>
     </article>
   );
 }
